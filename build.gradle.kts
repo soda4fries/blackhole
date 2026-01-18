@@ -22,7 +22,7 @@ sourceSets {
             setSrcDirs(listOf("src/main/java"))
         }
         resources {
-            setSrcDirs(listOf("src/main/resources"))
+            setSrcDirs(listOf("src/main/resources", "build/resources"))
         }
     }
 }
@@ -31,7 +31,6 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-// Task to download and setup jextract
 tasks.register("getJextract") {
     description = "Download and setup jextract tool"
     group = "build"
@@ -69,7 +68,6 @@ tasks.register("getJextract") {
     }
 }
 
-// Task to generate Java bindings from C header
 tasks.register<Exec>("extractHeaders") {
     description = "Generate Java bindings from blackhole.h using jextract"
     group = "build"
@@ -109,12 +107,11 @@ tasks.register<Exec>("extractHeaders") {
     }
 }
 
-// Task to build native library using CMake
 tasks.register<Exec>("buildNative") {
     description = "Build native library and eBPF programs using CMake"
     group = "build"
 
-    val buildDir = file("native/build")
+    val buildDir = file("build/resources/native/linux-x86_64")
 
     doFirst {
         buildDir.mkdirs()
@@ -122,35 +119,15 @@ tasks.register<Exec>("buildNative") {
 
     workingDir = buildDir
 
-    commandLine("bash", "-c", "cmake .. && make")
+    commandLine("bash", "-c", "cmake ../../../../native && make")
 }
 
-// Task to copy native artifacts to resources
-tasks.register<Copy>("copyNativeArtifacts") {
-    description = "Copy native library and eBPF programs to resources"
-    group = "build"
-
-    dependsOn("buildNative")
-
-    val resourcesNativeDir = file("src/main/resources/native/linux-x86_64")
-    resourcesNativeDir.mkdirs()
-
-    from("native/build") {
-        include("libblackhole.so")
-        include("tc_egress.o")
-        include("xdp_ingress.o")
-    }
-    into(resourcesNativeDir)
-}
-
-// Ensure Java compilation happens after bindings are generated
 tasks.named("compileJava") {
     dependsOn("extractHeaders")
 }
 
-// Make jar depend on native build
 tasks.named("processResources") {
-    dependsOn("copyNativeArtifacts")
+    dependsOn("buildNative")
 }
 
 // Make standard build task do everything
@@ -158,17 +135,14 @@ tasks.named("build") {
     doLast {
         println("\n✅ Build complete!")
         println("JAR location: ${tasks.jar.get().archiveFile.get()}")
-        println("\nUsage:")
-        println("  Blackhole.init(\"eth0\");")
-        println("  Blackhole.addWhitelistIp(\"192.168.1.1\");")
-        println("  Blackhole.cleanup();")
-    }
+        }
 }
 
 // Alias for convenience
 tasks.register("buildAll") {
     description = "Complete build: jextract, bindings, native code, and JAR (alias for 'build')"
     group = "build"
+ * Provides an easy-to-use Java API without dealing with memory segments.
     dependsOn("build")
 }
 
@@ -193,15 +167,11 @@ tasks.register<JavaExec>("runJava") {
     classpath = sourceSets["main"].runtimeClasspath
 }
 
-// Clean task
 tasks.clean {
-    delete("native/build")
-    delete("src/main/resources/native")
     delete("src/main/java/com/soda4fries/blackhole/Blackhole_h.java")
     delete("src/main/java/com/soda4fries/blackhole/Blackhole_h\$shared.java")
 }
 
-// Deep clean task - removes everything including jextract
 tasks.register("cleanAll") {
     description = "Clean all build artifacts including jextract"
     group = "build"

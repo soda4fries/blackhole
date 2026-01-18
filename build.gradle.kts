@@ -63,7 +63,7 @@ tasks.register("getJextract") {
             // Make executable
             jextractBin.setExecutable(true)
 
-            println("✅ jextract installed successfully")
+            println("Jextract installed")
         } finally {
             tempFile.delete()
         }
@@ -103,7 +103,7 @@ tasks.register<Exec>("extractHeaders") {
     )
 
     doLast {
-        println("✅ Java bindings generated in ${outputDir}")
+        println("Java bindings generated: ${outputDir}")
     }
 }
 
@@ -134,22 +134,12 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
-// Make standard build task do everything
 tasks.named("build") {
     doLast {
-        println("\n✅ Build complete!")
-        println("JAR location: ${tasks.jar.get().archiveFile.get()}")
+        println("\nBuild complete!\nJAR location: ${tasks.jar.get().archiveFile.get()}")
         }
 }
 
-// Alias for convenience
-tasks.register("buildAll") {
-    description = "Complete build: jextract, bindings, native code, and JAR (alias for 'build')"
-    group = "build"
-    dependsOn("build")
-}
-
-// Configure JAR to include native libraries
 tasks.jar {
     manifest {
         attributes(
@@ -162,7 +152,6 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-// Task to run Java application
 tasks.register<JavaExec>("runJava") {
     description = "Run Java application"
     group = "application"
@@ -183,6 +172,6 @@ tasks.register("cleanAll") {
 
     doLast {
         delete("jextract-25")
-        println("🗑️  Removed jextract-25")
+        println("Removed jextract-25")
     }
 }

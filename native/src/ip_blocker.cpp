@@ -19,7 +19,7 @@ static struct bpf_tc_hook tc_hook = {};
 static struct bpf_tc_opts tc_opts = {};
 static std::vector<std::string> whitelist_ips;
 static int map_fd = -1;
-static bool created_qdisc = false;  // Track if we created the qdisc
+static bool created_qdisc = false;  
 
 static void clear_map(int fd)
 {
@@ -29,25 +29,21 @@ static void clear_map(int fd)
 
     __u32 key = 0, next_key;
 
-    // Iterate through all keys and delete them
     while (bpf_map_get_next_key(fd, &key, &next_key) == 0) {
         bpf_map_delete_elem(fd, &next_key);
         key = next_key;
     }
 
-    // Delete the first key if it exists
     key = 0;
     bpf_map_delete_elem(fd, &key);
 }
 
 static void cleanup_internal(bool do_exit)
 {
-    // Clear the whitelist map before detaching
-    if (map_fd >= 0) {
+   \ if (map_fd >= 0) {
         clear_map(map_fd);
     }
 
-    // Detach XDP first
     if (ifindex > 0) {
         int ret = bpf_xdp_detach(ifindex, 0, nullptr);
         if (ret != 0) {
@@ -57,8 +53,6 @@ static void cleanup_internal(bool do_exit)
 
     // Detach TC program properly
     if (tc_hook.ifindex > 0) {
-        // For detach, we need to keep the handle and priority from attach
-        // but clear the prog_fd and set flags appropriately
         tc_opts.prog_fd = 0;
         tc_opts.prog_id = 0;
         tc_opts.flags = 0;
@@ -77,7 +71,6 @@ static void cleanup_internal(bool do_exit)
         }
     }
 
-    // Close BPF objects
     if (tc_obj) {
         bpf_object__close(tc_obj);
         tc_obj = nullptr;
@@ -87,7 +80,6 @@ static void cleanup_internal(bool do_exit)
         xdp_obj = nullptr;
     }
 
-    // Reset global state
     ifindex = -1;
     map_fd = -1;
     created_qdisc = false;
@@ -122,7 +114,7 @@ int add_to_whitelist(int map_fd, const char *ip_str)
 
     whitelist_ips.push_back(ip_str);
     return 0;
-}
+}add_to_whitelist
 
 extern "C" {
 
@@ -168,16 +160,15 @@ int blackhole_init(const char *ifname, const char *tc_prog_path, const char *xdp
         return -1;
     }
 
-    /* Setup TC hook for egress */
     tc_hook.sz = sizeof(tc_hook);
     tc_hook.ifindex = ifindex;
     tc_hook.attach_point = BPF_TC_EGRESS;
 
     int ret = bpf_tc_hook_create(&tc_hook);
     if (ret == 0) {
-        created_qdisc = true;  // We created the qdisc
+        created_qdisc = true; 
     } else if (ret == -EEXIST) {
-        created_qdisc = false;  // Qdisc already existed
+        created_qdisc = false;  
     } else {
         std::cerr << "Error: Failed to create TC hook\n";
         bpf_object__close(tc_obj);

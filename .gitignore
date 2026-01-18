@@ -8,3 +8,5 @@ out/
 *.jar
 *.swp
 *.DS_Store
+.gradle/
+native/build/

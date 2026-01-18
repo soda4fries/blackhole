@@ -8,7 +8,7 @@
 
 
 
-/* Shared whitelist map (same as XDP program) */
+/* Shared whitelist map */
 struct {
     __uint(type, BPF_MAP_TYPE_HASH);
     __uint(max_entries, WHITELIST_MAP_SIZE);
@@ -43,7 +43,6 @@ int tc_egress_func(struct __sk_buff *skb)
         __u8 allowed = 1;
         bpf_map_update_elem(&whitelist_map, &dst_ip, &allowed, BPF_ANY);
 
-        // Print new IPs only
         bpf_printk("TC EGRESS: added %d.%d.%d.%d to whitelist\n",
                    dst_ip & 0xff,
                    (dst_ip >> 8) & 0xff,

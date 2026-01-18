@@ -1,34 +1,33 @@
-# Blackhole
+# Blackhole IP Blocker
+
+Linux eBPF-based IP whitelisting library with Java bindings.
+
+## Dependencies
+
+```bash
+sudo apt install -y build-essential cmake clang gcc-multilib libbpf-dev libelf-dev pkg-config openjdk-25-jdk linux-headers-$(uname -r)
+```
 
 ## Build
 
 ```bash
-mkdir build && cd build
-cmake ..
-make
+./gradlew build
 ```
+
+Output: `build/libs/blackhole-1.0.0.jar`
 
 ## Usage
 
-### Terminal
+```java
+Blackhole.init("eth0");
+Blackhole.addWhitelistIp("192.168.1.1");
+Blackhole.clearWhitelist();
+Blackhole.cleanup();
+```
+
+## Clean
 
 ```bash
-sudo ./ip_blocker <interface> [whitelist_ips...]
+./gradlew clean      # Clean build artifacts
+./gradlew cleanAll   # Remove everything including jextract
 ```
-
-Example:
-```bash
-sudo ./ip_blocker eth0 192.168.1.1 10.0.0.1
-```
-
-### Library
-
-```c
-#include <blackhole.h>
-
-blackhole_init("eth0", "tc_egress.o", "xdp_ingress.o");
-blackhole_add_whitelist_ip("192.168.1.1");
-blackhole_cleanup();
-```
-
-Compile: `gcc -o app app.c -lblackhole`

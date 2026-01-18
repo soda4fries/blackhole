@@ -11,9 +11,9 @@ pkg_check_modules(LIBBPF REQUIRED libbpf)
 
 # Include directories for userspace program
 include_directories(
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/include
-    ${LIBBPF_INCLUDE_DIRS}  # libbpf helpers
+    ${CMAKE_SOURCE_DIR}/../shared  # Public API header
+    ${CMAKE_SOURCE_DIR}/include    # Internal headers (common.h)
+    ${LIBBPF_INCLUDE_DIRS}         # libbpf helpers
 )
 
 # eBPF program sources
@@ -26,10 +26,10 @@ set(XDP_BPF_OBJECT ${CMAKE_BINARY_DIR}/xdp_ingress.o)
 add_custom_command(
     OUTPUT ${TC_BPF_OBJECT}
     COMMAND clang -O2 -g -target bpf -D__TARGET_ARCH_${ARCH} -c ${TC_BPF_SOURCE}
-        -I${CMAKE_SOURCE_DIR}/src
+        -I${CMAKE_SOURCE_DIR}/include
         -I${LIBBPF_INCLUDE_DIRS}
         -o ${TC_BPF_OBJECT}
-    DEPENDS ${TC_BPF_SOURCE} ${CMAKE_SOURCE_DIR}/src/common.h
+    DEPENDS ${TC_BPF_SOURCE} ${CMAKE_SOURCE_DIR}/include/common.h
     COMMENT "Compiling TC eBPF program"
 )
 
@@ -37,10 +37,10 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${XDP_BPF_OBJECT}
     COMMAND clang -O2 -g -target bpf -D__TARGET_ARCH_${ARCH} -c ${XDP_BPF_SOURCE}
-            -I${CMAKE_SOURCE_DIR}/src
+            -I${CMAKE_SOURCE_DIR}/include
             -I${LIBBPF_INCLUDE_DIRS}
             -o ${XDP_BPF_OBJECT}
-    DEPENDS ${XDP_BPF_SOURCE} ${CMAKE_SOURCE_DIR}/src/common.h
+    DEPENDS ${XDP_BPF_SOURCE} ${CMAKE_SOURCE_DIR}/include/common.h
     COMMENT "Compiling XDP eBPF program"
 )
 
@@ -54,7 +54,7 @@ add_library(blackhole SHARED src/ip_blocker.cpp)
 set_target_properties(blackhole PROPERTIES
     VERSION 1.0.0
     SOVERSION 1
-    PUBLIC_HEADER include/blackhole.h
+    PUBLIC_HEADER ${CMAKE_SOURCE_DIR}/../shared/blackhole.h
 )
 
 # Link libraries for shared library

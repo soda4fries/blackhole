@@ -40,27 +40,23 @@ tasks.register("getJextract") {
     val jextractBin = file("jextract-25/bin/jextract")
     val jextractUrl = "https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_linux-x64_bin.tar.gz"
 
-    // Only run if jextract doesn't exist
     onlyIf { !jextractBin.exists() }
 
     doLast {
-        println("📥 Downloading jextract from ${jextractUrl}...")
+        println("Downloading jextract from ${jextractUrl}...")
 
         val tempFile = File.createTempFile("jextract", ".tar.gz")
         try {
-            // Download
             ant.invokeMethod("get", mapOf(
                 "src" to jextractUrl,
                 "dest" to tempFile.absolutePath
             ))
 
-            // Extract
             copy {
                 from(tarTree(tempFile))
                 into(projectDir)
             }
 
-            // Make executable
             jextractBin.setExecutable(true)
 
             println("Jextract installed")

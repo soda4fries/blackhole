@@ -41,6 +41,8 @@ cd build/resources/main/native/linux-x86_64/
 sudo ./ip_blocker wlp5s0 192.168.1.1 192.168.1.2
 ```
 
+Only IP in the white list are allowed to connect, all outgoing connections will be auto added.
+
 **List eBPF maps:**
 ```bash
 sudo bpftool map list

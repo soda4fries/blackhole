@@ -1,3 +1,5 @@
+import org.gradle.language.jvm.tasks.ProcessResources
+
 plugins {
     java
     `java-library`
@@ -22,7 +24,7 @@ sourceSets {
             setSrcDirs(listOf("src/main/java"))
         }
         resources {
-            setSrcDirs(listOf("src/main/resources", "build/resources"))
+            setSrcDirs(listOf("src/main/resources"))
         }
     }
 }
@@ -80,9 +82,7 @@ tasks.register<Exec>("extractHeaders") {
     val packageName = "com.soda4fries.blackhole"
     val headerClassName = "Blackhole_h"
 
-    // Check if bindings already exist
-    val bindingsExist = file("src/main/java/com/soda4fries/blackhole/Blackhole_h.java").exists()
-    onlyIf { !bindingsExist }
+    onlyIf { !file("src/main/java/com/soda4fries/blackhole/Blackhole_h.java").exists() }
 
     doFirst {
         outputDir.mkdirs()
@@ -126,8 +126,12 @@ tasks.named("compileJava") {
     dependsOn("extractHeaders")
 }
 
-tasks.named("processResources") {
+tasks.named<ProcessResources>("processResources") {
     dependsOn("buildNative")
+
+    from("build/resources/native") {
+        into("native")
+    }
 }
 
 // Make standard build task do everything
@@ -142,7 +146,6 @@ tasks.named("build") {
 tasks.register("buildAll") {
     description = "Complete build: jextract, bindings, native code, and JAR (alias for 'build')"
     group = "build"
- * Provides an easy-to-use Java API without dealing with memory segments.
     dependsOn("build")
 }
 

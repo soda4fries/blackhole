@@ -40,7 +40,7 @@ static void clear_map(int fd)
 
 static void cleanup_internal(bool do_exit)
 {
-   \ if (map_fd >= 0) {
+    if (map_fd >= 0) {
         clear_map(map_fd);
     }
 
@@ -114,7 +114,7 @@ int add_to_whitelist(int map_fd, const char *ip_str)
 
     whitelist_ips.push_back(ip_str);
     return 0;
-}add_to_whitelist
+}
 
 extern "C" {
 

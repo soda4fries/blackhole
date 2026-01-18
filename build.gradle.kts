@@ -127,6 +127,8 @@ tasks.named<ProcessResources>("processResources") {
 
     from("build/resources/native") {
         into("native")
+        include("**/*.so", "**/*.so.*", "**/*.o", "**/ip_blocker")
+        exclude("**/CMakeFiles/**", "**/CMakeCache.txt", "**/Makefile", "**/cmake_install.cmake", "**/*.cmake", "**/*.make", "**/*.marks", "**/*.check_cache")
     }
 }
 

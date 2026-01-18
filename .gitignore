@@ -1,0 +1,10 @@
+jextract-25/
+build/
+out/
+*.o
+*.so
+*.a
+*.class
+*.jar
+*.swp
+*.DS_Store

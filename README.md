@@ -2,6 +2,9 @@
 
 Linux eBPF-based IP whitelisting library with Java bindings.
 
+XDP hook on rx path to drop traffic
+TC hook on tx path to add outgoing traffic to shared whitelist to allow return packets
+
 ## Dependencies
 
 ```bash

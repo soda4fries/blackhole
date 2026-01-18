@@ -22,11 +22,31 @@ Output: `build/libs/blackhole-1.0.0.jar`
 
 ## Usage
 
+### Java Library
+
 ```java
 Blackhole.init("eth0");
 Blackhole.addWhitelistIp("192.168.1.1");
 Blackhole.clearWhitelist();
 Blackhole.cleanup();
+```
+
+### Standalone Binary (ip_blocker)
+
+**Attach to interface:**
+```bash
+sudo build/resources/main/native/linux-x86_64/ip_blocker eth0 192.168.1.1 192.168.1.2
+```
+
+**List eBPF maps:**
+```bash
+sudo bpftool map list
+sudo bpftool map dump name whitelist_map
+```
+
+**View trace output:**
+```bash
+sudo cat /sys/kernel/debug/tracing/trace_pipe
 ```
 
 ## Clean

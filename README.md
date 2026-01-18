@@ -60,3 +60,16 @@ sudo cat /sys/kernel/debug/tracing/trace_pipe
 ./gradlew clean      # Clean build artifacts
 ./gradlew cleanAll   # Remove everything including jextract
 ```
+
+## TODO
+
+- **Attach to multiple interfaces**
+  - Attaching to multiple network interfaces from the Java wrapper (Native bindings can attach to multiple by rerun) 
+
+- **Per-interface option whitelisting**
+  - Separate maps per interface
+
+- **Statistics collection**
+  - Collect runtime statistics (per cpu maps and buffers)
+  - Expose stats via the Java API.
+

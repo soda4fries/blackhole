@@ -23,6 +23,24 @@ public class Blackhole {
     private static volatile boolean initialized = false;
     private static String currentInterface;
 
+    // Static initializer to load the native library
+    static {
+        try {
+            // Extract and load the native library from the JAR
+            Path libPath = extractResource(
+                RESOURCE_BASE + "libblackhole.so",
+                "libblackhole",
+                ".so"
+            );
+            libPath.toFile().deleteOnExit();
+            System.load(libPath.toAbsolutePath().toString());
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(
+                "Failed to load native library libblackhole.so: " + e.getMessage()
+            );
+        }
+    }
+
     /**
      * Initialize the blackhole IP blocker.
      * Automatically extracts BPF programs from bundled resources.

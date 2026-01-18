@@ -34,8 +34,11 @@ Blackhole.cleanup();
 ### Standalone Binary (ip_blocker)
 
 **Attach to interface:**
+
+
 ```bash
-sudo build/resources/main/native/linux-x86_64/ip_blocker eth0 192.168.1.1 192.168.1.2
+cd build/resources/main/native/linux-x86_64/
+sudo ./ip_blocker wlp5s0 192.168.1.1 192.168.1.2
 ```
 
 **List eBPF maps:**
